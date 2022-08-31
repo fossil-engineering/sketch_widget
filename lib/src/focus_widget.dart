@@ -1,7 +1,7 @@
 part of 'draft_widget.dart';
 
-class _HoverWidget extends StatelessWidget {
-  const _HoverWidget({required this.positionState, required this.scaleState});
+class _FocusWidget extends StatelessWidget {
+  const _FocusWidget({required this.positionState, required this.scaleState});
 
   final ValueNotifier<Rect?> positionState;
   final ValueNotifier<double> scaleState;
@@ -16,8 +16,16 @@ class _HoverWidget extends StatelessWidget {
           valueListenable: scaleState,
           builder: (_, scale, __) => Positioned.fromRect(
             rect: position,
-            child: IgnorePointer(
-              child: CustomPaint(painter: _HoverPainter(scale)),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned.fromRect(
+                  rect: Rect.fromLTWH(0, 0, position.width, position.height),
+                  child: IgnorePointer(
+                    child: CustomPaint(painter: _FocusPainter(scale)),
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -30,14 +38,14 @@ class _HoverWidget extends StatelessWidget {
   }
 }
 
-class _HoverPainter extends CustomPainter {
-  _HoverPainter(this.scale);
+class _FocusPainter extends CustomPainter {
+  _FocusPainter(this.scale);
 
   final double scale;
 
   late final _paint = Paint()
-    ..color = Colors.orange
-    ..strokeWidth = 2 / scale
+    ..color = Colors.white
+    ..strokeWidth = 1 / scale
     ..style = PaintingStyle.stroke;
   final _path = Path();
 
