@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 part 'transform_widget.dart';
 
-part 'hover_widget.dart';
-
-part 'focus_widget.dart';
+part 'decoration_widget.dart';
 
 /// No position index
 const noPosition = -1;
@@ -78,8 +76,18 @@ class DraftWidget extends StatelessWidget {
                 );
               },
             ),
-            _FocusWidget(positionState: focusPosition, scaleState: scaleState),
-            _HoverWidget(positionState: hoverPosition, scaleState: scaleState),
+            _DecorationWidget(
+              positionState: focusPosition,
+              scaleState: scaleState,
+              color: Colors.white,
+              strokeWidth: 0.5,
+            ),
+            _DecorationWidget(
+              positionState: hoverPosition,
+              scaleState: scaleState,
+              color: Colors.orange,
+              strokeWidth: 2,
+            ),
           ],
         ),
       ),
