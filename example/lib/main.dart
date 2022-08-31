@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:draft_widget/draft_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -76,13 +78,21 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: const DraftWidget(
-        sketch: [
-          {
-            'position': Rect.fromLTWH(10, 10, 100, 100),
+      body: DraftWidget(
+        sketch: const {
+          1: {
+            'position': Rect.fromLTWH(100, 100, 100, 100),
             'widget': ColoredBox(color: Colors.red)
-          }
-        ],
+          },
+          2: {
+            'position': Rect.fromLTWH(150, 150, 100, 100),
+            'widget': ColoredBox(color: Colors.yellow)
+          },
+          3: {
+            'position': Rect.fromLTWH(200, 200, 100, 100),
+            'widget': ColoredBox(color: Colors.blue)
+          },
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
