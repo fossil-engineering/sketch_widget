@@ -97,12 +97,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: DraftWidget(
-        hoverState: ValueNotifier<int>(noPosition),
         focusState: _focus,
         lockRatio: _lockRatio,
         sketch: _sketch,
         onTransform: (rect) {
-          debugPrint('rect=$rect');
           setState(() {
             _sketch = _sketch.map((id, widget) => MapEntry(
                 id,

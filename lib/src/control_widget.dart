@@ -321,8 +321,8 @@ class _PositionedWidget extends StatelessWidget {
         height: 16 / scaleY,
       ),
       child: GestureDetector(
-        onPanUpdate: (d) => onUpdate(d.localPosition),
-        onPanEnd: (d) => onEnd(),
+        onPanUpdate: (details) => onUpdate(details.localPosition),
+        onPanEnd: (_) => onEnd(),
         child: MouseRegion(
           cursor: cursor,
           child: Container(

@@ -11,6 +11,7 @@ class _TransformWidget extends StatelessWidget {
     required this.transformingState,
     required this.position,
     required this.child,
+    required this.onEnd,
   });
 
   final int id;
@@ -22,24 +23,34 @@ class _TransformWidget extends StatelessWidget {
   final ValueNotifier<bool> transformingState;
   final Rect position;
   final Widget child;
+  final VoidCallback onEnd;
 
   @override
   Widget build(BuildContext context) {
     return Positioned.fromRect(
       rect: position,
-      child: ValueListenableBuilder<Matrix4>(
-        valueListenable: transformState,
-        builder: (_, transform, child) {
-          return id == focusState.value
-              ? Transform(transform: transform, child: child)
-              : child!;
+      child: GestureDetector(
+        onTap: () {
+          if (focusState.value != id) {
+            focusState.value = id;
+            focusPosition.value = position;
+          }
         },
-        child: GestureDetector(
-          onTap: () {
-            if (focusState.value != id) {
-              focusState.value = id;
-              focusPosition.value = position;
-            }
+        onPanUpdate: (details) {
+          if (id != focusState.value) return;
+          transformingState.value = true;
+          hoverState.value = noPosition;
+          hoverPosition.value = null;
+          transformState.value = Matrix4.copy(transformState.value)
+            ..translate(details.delta.dx, details.delta.dy);
+        },
+        onPanEnd: (_) => onEnd(),
+        child: ValueListenableBuilder<Matrix4>(
+          valueListenable: transformState,
+          builder: (_, transform, child) {
+            return id == focusState.value
+                ? Transform(transform: transform, child: child)
+                : child!;
           },
           child: MouseRegion(
             child: child,

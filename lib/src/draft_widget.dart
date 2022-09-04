@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 part 'control_widget.dart';
+
 part 'decoration_widget.dart';
+
 part 'transform_widget.dart';
 
 /// No position index
@@ -12,34 +14,33 @@ const noPosition = -1;
 /// DraftWidget to draft widgets
 class DraftWidget extends StatelessWidget {
   /// DraftWidget Constructor
-  const DraftWidget({
-    required this.hoverState,
-    required this.focusState,
+  DraftWidget({
     required this.sketch,
-    required this.lockRatio,
-    required this.onTransform,
+    ValueNotifier<int>? hoverState,
+    ValueNotifier<int>? focusState,
+    ValueNotifier<bool>? lockRatio,
+    this.onTransform,
     super.key,
-  });
-
-  /// Hover state contain index of element that is hovered.
-  final ValueNotifier<int> hoverState;
-
-  /// Focus state contain index of element that is focused.
-  final ValueNotifier<int> focusState;
-
-  /// LockRatio state contain true if we lock ratio when resize.
-  final ValueNotifier<bool> lockRatio;
+  })  : _hoverState = hoverState ?? ValueNotifier(noPosition),
+        _focusState = focusState ?? ValueNotifier(noPosition),
+        _lockRatio = lockRatio ?? ValueNotifier(true);
 
   /// Widgets will be drafted.
   final Map<int, Map<String, dynamic>> sketch;
 
   /// Callback when end transforming.
-  final void Function(Rect) onTransform;
+  final void Function(Rect)? onTransform;
+
+  final ValueNotifier<int> _hoverState;
+
+  final ValueNotifier<int> _focusState;
+
+  final ValueNotifier<bool> _lockRatio;
 
   @override
   Widget build(BuildContext context) {
-    final hoverPosition = ValueNotifier<Rect?>(_position(hoverState.value));
-    final focusPosition = ValueNotifier<Rect?>(_position(focusState.value));
+    final hoverPosition = ValueNotifier<Rect?>(_position(_hoverState.value));
+    final focusPosition = ValueNotifier<Rect?>(_position(_focusState.value));
     final controller = TransformationController();
     final scaleState = ValueNotifier<double>(1);
     final transformState = ValueNotifier<Matrix4>(Matrix4.identity());
@@ -47,8 +48,8 @@ class DraftWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (focusState.value != noPosition) {
-          focusState.value = noPosition;
+        if (_focusState.value != noPosition) {
+          _focusState.value = noPosition;
           focusPosition.value = null;
         }
       },
@@ -64,12 +65,15 @@ class DraftWidget extends StatelessWidget {
                 id: e.key,
                 transformState: transformState,
                 focusPosition: focusPosition,
-                focusState: focusState,
+                focusState: _focusState,
                 hoverPosition: hoverPosition,
-                hoverState: hoverState,
+                hoverState: _hoverState,
                 transformingState: transformingState,
                 position: e.value['position'] as Rect,
                 child: e.value['widget'] as Widget,
+                onEnd: () => onTransform?.call(
+                  transformState.value.transformRect(focusPosition.value!),
+                ),
               ),
             ),
             _DecorationWidget(
@@ -90,12 +94,12 @@ class DraftWidget extends StatelessWidget {
               positionState: focusPosition,
               scaleState: scaleState,
               transformingState: transformingState,
-              hoverState: hoverState,
+              hoverState: _hoverState,
               hoverPosition: hoverPosition,
               focusPosition: focusPosition,
-              lockRatio: lockRatio,
+              lockRatio: _lockRatio,
               transformState: transformState,
-              onEnd: () => onTransform(
+              onEnd: () => onTransform?.call(
                 transformState.value.transformRect(focusPosition.value!),
               ),
             ),
