@@ -49,6 +49,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _lockRatio = ValueNotifier<bool>(true);
+  Map<int, Map<String, dynamic>> _sketch = {
+    1: {
+      'position': const Rect.fromLTWH(100, 100, 100, 100),
+      'widget': const ColoredBox(color: Colors.red)
+    },
+    2: {
+      'position': const Rect.fromLTWH(150, 150, 100, 100),
+      'widget': const ColoredBox(color: Colors.yellow)
+    },
+    3: {
+      'position': const Rect.fromLTWH(200, 200, 100, 100),
+      'widget': const ColoredBox(color: Colors.blue)
+    },
+  };
+
+  final _focus = ValueNotifier<int>(noPosition);
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -63,23 +81,36 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            onPressed: () => _lockRatio.value ^= true,
+            icon: ValueListenableBuilder<bool>(
+              valueListenable: _lockRatio,
+              builder: (_, lockRatio, __) {
+                return Icon(
+                  Icons.aspect_ratio,
+                  color: lockRatio ? Colors.black : Colors.grey,
+                );
+              },
+            ),
+          )
+        ],
       ),
       body: DraftWidget(
-        hover: ValueNotifier<int>(noPosition),
-        focus: ValueNotifier<int>(noPosition),
-        sketch: const {
-          1: {
-            'position': Rect.fromLTWH(100, 100, 100, 100),
-            'widget': ColoredBox(color: Colors.red)
-          },
-          2: {
-            'position': Rect.fromLTWH(150, 150, 100, 100),
-            'widget': ColoredBox(color: Colors.yellow)
-          },
-          3: {
-            'position': Rect.fromLTWH(200, 200, 100, 100),
-            'widget': ColoredBox(color: Colors.blue)
-          },
+        hoverState: ValueNotifier<int>(noPosition),
+        focusState: _focus,
+        lockRatio: _lockRatio,
+        sketch: _sketch,
+        onTransform: (rect) {
+          debugPrint('rect=$rect');
+          setState(() {
+            _sketch = _sketch.map((id, widget) => MapEntry(
+                id,
+                id == _focus.value
+                    ? widget.map((key, value) =>
+                        MapEntry(key, key == 'position' ? rect : value))
+                    : widget));
+          });
         },
       ),
     );
