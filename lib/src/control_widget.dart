@@ -1,31 +1,42 @@
 part of 'draft_widget.dart';
 
-final _quaternionIdentity = Quaternion.identity();
-final _translationZero = Vector3.zero();
-final _translationVector3 = Vector3.zero();
-final _scaleVector3 = Vector3.zero();
+const _cursors = [
+  SystemMouseCursors.resizeUpLeftDownRight,
+  SystemMouseCursors.resizeUpDown,
+  SystemMouseCursors.resizeUpRightDownLeft,
+  SystemMouseCursors.resizeLeftRight,
+  SystemMouseCursors.resizeUpLeftDownRight,
+  SystemMouseCursors.resizeUpDown,
+  SystemMouseCursors.resizeUpRightDownLeft,
+  SystemMouseCursors.resizeLeftRight,
+];
 
-class _ControlWidget extends StatelessWidget {
-  const _ControlWidget({
+class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
+  _ControlWidget({
     required this.positionState,
+    required this.angleState,
     required this.scaleState,
-    required this.transformingState,
-    required this.hoverState,
-    required this.hoverPosition,
-    required this.focusPosition,
-    required this.lockRatio,
-    required this.transformState,
+    required ValueNotifier<bool> transformingState,
+    required ValueNotifier<int> hoverState,
+    required ValueNotifier<Rect?> hoverPosition,
+    required ValueNotifier<Rect?> focusPosition,
+    required ValueNotifier<bool> lockRatio,
+    required ValueNotifier<Matrix4> transformState,
+    required this.rotateState,
     required this.onEnd,
-  });
+  }) {
+    this.transformingState = transformingState;
+    this.hoverState = hoverState;
+    this.hoverPosition = hoverPosition;
+    this.focusPosition = focusPosition;
+    this.lockRatio = lockRatio;
+    this.transformState = transformState;
+  }
 
   final ValueNotifier<Rect?> positionState;
+  final ValueNotifier<double> angleState;
   final ValueNotifier<double> scaleState;
-  final ValueNotifier<bool> transformingState;
-  final ValueNotifier<int> hoverState;
-  final ValueNotifier<Rect?> hoverPosition;
-  final ValueNotifier<Rect?> focusPosition;
-  final ValueNotifier<bool> lockRatio;
-  final ValueNotifier<Matrix4> transformState;
+  final ValueNotifier<bool> rotateState;
   final void Function() onEnd;
 
   @override
@@ -38,260 +49,121 @@ class _ControlWidget extends StatelessWidget {
           valueListenable: scaleState,
           builder: (_, scale, __) => Positioned.fromRect(
             rect: position,
-            child: ValueListenableBuilder<Matrix4>(
-              valueListenable: transformState,
-              builder: (_, transform, __) {
-                return Transform.rotate(
-                  angle: 0,
-                  child: Transform(
-                    transform: transform,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        _PositionedWidget(
-                          center: Offset.zero,
-                          scaleX: scale * transform.getScaleX(),
-                          scaleY: scale * transform.getScaleY(),
-                          cursor: SystemMouseCursors.resizeUpLeftDownRight,
-                          onUpdate: _onTopLeftUpdate,
-                          onEnd: onEnd,
-                        ),
-                        _PositionedWidget(
-                          center: Offset(position.width / 2, 0),
-                          scaleX: scale * transform.getScaleX(),
-                          scaleY: scale * transform.getScaleY(),
-                          cursor: SystemMouseCursors.resizeUpDown,
-                          onUpdate: _onTopUpdate,
-                          onEnd: onEnd,
-                        ),
-                        _PositionedWidget(
-                          center: Offset(position.width, 0),
-                          scaleX: scale * transform.getScaleX(),
-                          scaleY: scale * transform.getScaleY(),
-                          cursor: SystemMouseCursors.resizeUpRightDownLeft,
-                          onUpdate: _onTopRightUpdate,
-                          onEnd: onEnd,
-                        ),
-                        _PositionedWidget(
-                          center: Offset(position.width, position.height / 2),
-                          scaleX: scale * transform.getScaleX(),
-                          scaleY: scale * transform.getScaleY(),
-                          cursor: SystemMouseCursors.resizeLeftRight,
-                          onUpdate: _onRightUpdate,
-                          onEnd: onEnd,
-                        ),
-                        _PositionedWidget(
-                          center: Offset(position.width, position.height),
-                          scaleX: scale * transform.getScaleX(),
-                          scaleY: scale * transform.getScaleY(),
-                          cursor: SystemMouseCursors.resizeUpLeftDownRight,
-                          onUpdate: _onBottomRightUpdate,
-                          onEnd: onEnd,
-                        ),
-                        _PositionedWidget(
-                          center: Offset(position.width / 2, position.height),
-                          scaleX: scale * transform.getScaleX(),
-                          scaleY: scale * transform.getScaleY(),
-                          cursor: SystemMouseCursors.resizeUpDown,
-                          onUpdate: _onBottomUpdate,
-                          onEnd: onEnd,
-                        ),
-                        _PositionedWidget(
-                          center: Offset(0, position.height),
-                          scaleX: scale * transform.getScaleX(),
-                          scaleY: scale * transform.getScaleY(),
-                          cursor: SystemMouseCursors.resizeUpRightDownLeft,
-                          onUpdate: _onBottomLeftUpdate,
-                          onEnd: onEnd,
-                        ),
-                        _PositionedWidget(
-                          center: Offset(0, position.height / 2),
-                          scaleX: scale * transform.getScaleX(),
-                          scaleY: scale * transform.getScaleY(),
-                          cursor: SystemMouseCursors.resizeLeftRight,
-                          onUpdate: _onLeftUpdate,
-                          onEnd: onEnd,
-                        ),
-                      ],
+            child: ValueListenableBuilder<bool>(
+              valueListenable: rotateState,
+              builder: (_, rotate, __) => ValueListenableBuilder<Matrix4>(
+                valueListenable: transformState,
+                builder: (_, transform, __) {
+                  final angle = angleState.value;
+                  final startIndex = rotate
+                      ? 0
+                      : (((degrees(angle) % 360 + 360) % 360) ~/ 22.5 + 1) ~/ 2;
+                  return Transform.rotate(
+                    angle: angle,
+                    child: Transform(
+                      transform: transform,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          _PositionedWidget(
+                            center: Offset.zero,
+                            scaleX: scale * transform.getScaleX(),
+                            scaleY: scale * transform.getScaleY(),
+                            cursor: rotate
+                                ? SystemMouseCursors.grab
+                                : _cursors[startIndex % 8],
+                            onUpdate:
+                                rotate ? _onTopLeftRotate : _onTopLeftResize,
+                            onEnd: onEnd,
+                          ),
+                          _PositionedWidget(
+                            center: Offset(position.width / 2, 0),
+                            scaleX: scale * transform.getScaleX(),
+                            scaleY: scale * transform.getScaleY(),
+                            cursor: rotate
+                                ? SystemMouseCursors.grab
+                                : _cursors[(startIndex + 1) % 8],
+                            onUpdate: rotate ? _onTopRotate : _onTopResize,
+                            onEnd: onEnd,
+                          ),
+                          _PositionedWidget(
+                            center: Offset(position.width, 0),
+                            scaleX: scale * transform.getScaleX(),
+                            scaleY: scale * transform.getScaleY(),
+                            cursor: rotate
+                                ? SystemMouseCursors.grab
+                                : _cursors[(startIndex + 2) % 8],
+                            onUpdate:
+                                rotate ? _onTopRightRotate : _onTopRightResize,
+                            onEnd: onEnd,
+                          ),
+                          _PositionedWidget(
+                            center: Offset(position.width, position.height / 2),
+                            scaleX: scale * transform.getScaleX(),
+                            scaleY: scale * transform.getScaleY(),
+                            cursor: rotate
+                                ? SystemMouseCursors.grab
+                                : _cursors[(startIndex + 3) % 8],
+                            onUpdate: rotate ? _onRightRotate : _onRightResize,
+                            onEnd: onEnd,
+                          ),
+                          _PositionedWidget(
+                            center: Offset(position.width, position.height),
+                            scaleX: scale * transform.getScaleX(),
+                            scaleY: scale * transform.getScaleY(),
+                            cursor: rotate
+                                ? SystemMouseCursors.grab
+                                : _cursors[(startIndex + 4) % 8],
+                            onUpdate: rotate
+                                ? _onBottomRightRotate
+                                : _onBottomRightResize,
+                            onEnd: onEnd,
+                          ),
+                          _PositionedWidget(
+                            center: Offset(position.width / 2, position.height),
+                            scaleX: scale * transform.getScaleX(),
+                            scaleY: scale * transform.getScaleY(),
+                            cursor: rotate
+                                ? SystemMouseCursors.grab
+                                : _cursors[(startIndex + 5) % 8],
+                            onUpdate:
+                                rotate ? _onBottomRotate : _onBottomResize,
+                            onEnd: onEnd,
+                          ),
+                          _PositionedWidget(
+                            center: Offset(0, position.height),
+                            scaleX: scale * transform.getScaleX(),
+                            scaleY: scale * transform.getScaleY(),
+                            cursor: rotate
+                                ? SystemMouseCursors.grab
+                                : _cursors[(startIndex + 6) % 8],
+                            onUpdate: rotate
+                                ? _onBottomLeftRotate
+                                : _onBottomLeftResize,
+                            onEnd: onEnd,
+                          ),
+                          _PositionedWidget(
+                            center: Offset(0, position.height / 2),
+                            scaleX: scale * transform.getScaleX(),
+                            scaleY: scale * transform.getScaleY(),
+                            cursor: rotate
+                                ? SystemMouseCursors.grab
+                                : _cursors[(startIndex + 7) % 8],
+                            onUpdate: rotate ? _onLeftRotate : _onLeftResize,
+                            onEnd: onEnd,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         );
       },
       child: const _ZeroPositioned(),
     );
-  }
-
-  void _onTopLeftUpdate(Offset offset) {
-    _transforming();
-    focusPosition.value?.let((rect) {
-      final newOffset = lockRatio.value ? offset.intersect(rect.size) : offset;
-      _scaleVector3.setValues(
-        (rect.width - newOffset.dx) / rect.width,
-        (rect.height - newOffset.dy) / rect.height,
-        1,
-      );
-      _translationVector3.setValues(newOffset.dx, newOffset.dy, 0);
-      transformState.value = Matrix4.compose(
-        _translationVector3,
-        _quaternionIdentity,
-        _scaleVector3,
-      );
-    });
-  }
-
-  void _onTopUpdate(Offset offset) {
-    _transforming();
-    focusPosition.value?.let((rect) {
-      final scale = (rect.height - offset.dy) / rect.height;
-      _scaleVector3.setValues(
-        lockRatio.value ? scale : 1,
-        scale,
-        1,
-      );
-      _translationVector3.setValues(
-        lockRatio.value ? (rect.width - rect.width * scale) / 2 : 0,
-        offset.dy,
-        0,
-      );
-      transformState.value = Matrix4.compose(
-        _translationVector3,
-        _quaternionIdentity,
-        _scaleVector3,
-      );
-    });
-  }
-
-  void _onTopRightUpdate(Offset offset) {
-    _transforming();
-    focusPosition.value?.let((rect) {
-      final newOffset = lockRatio.value
-          ? offset.intersect(Size(-rect.width, rect.height))
-          : offset;
-      _scaleVector3.setValues(
-        (rect.width + newOffset.dx) / rect.width,
-        (rect.height - newOffset.dy) / rect.height,
-        1,
-      );
-      _translationVector3.setValues(0, newOffset.dy, 0);
-      transformState.value = Matrix4.compose(
-        _translationVector3,
-        _quaternionIdentity,
-        _scaleVector3,
-      );
-    });
-  }
-
-  void _onRightUpdate(Offset offset) {
-    _transforming();
-    focusPosition.value?.let((rect) {
-      final scale = (rect.width + offset.dx) / rect.width;
-      _scaleVector3.setValues(
-        scale,
-        lockRatio.value ? scale : 1,
-        1,
-      );
-      _translationVector3.setValues(
-        0,
-        lockRatio.value ? (rect.width - rect.width * scale) / 2 : 0,
-        0,
-      );
-      transformState.value = Matrix4.compose(
-        _translationVector3,
-        _quaternionIdentity,
-        _scaleVector3,
-      );
-    });
-  }
-
-  void _onBottomRightUpdate(Offset offset) {
-    _transforming();
-    focusPosition.value?.let((rect) {
-      final newOffset = lockRatio.value ? offset.intersect(rect.size) : offset;
-      _scaleVector3.setValues(
-        (rect.width + newOffset.dx) / rect.width,
-        (rect.height + newOffset.dy) / rect.height,
-        1,
-      );
-      transformState.value = Matrix4.compose(
-        _translationZero,
-        _quaternionIdentity,
-        _scaleVector3,
-      );
-    });
-  }
-
-  void _onBottomUpdate(Offset offset) {
-    _transforming();
-    focusPosition.value?.let((rect) {
-      final scale = (rect.height + offset.dy) / rect.height;
-      _scaleVector3.setValues(
-        lockRatio.value ? scale : 1,
-        scale,
-        1,
-      );
-      _translationVector3.setValues(
-        lockRatio.value ? (rect.width - rect.width * scale) / 2 : 0,
-        0,
-        0,
-      );
-      transformState.value = Matrix4.compose(
-        _translationVector3,
-        _quaternionIdentity,
-        _scaleVector3,
-      );
-    });
-  }
-
-  void _onBottomLeftUpdate(Offset offset) {
-    _transforming();
-    focusPosition.value?.let((rect) {
-      final newOffset = lockRatio.value
-          ? offset.intersect(Size(-rect.width, rect.height))
-          : offset;
-      _scaleVector3.setValues(
-        (rect.width - newOffset.dx) / rect.width,
-        (rect.height + newOffset.dy) / rect.height,
-        1,
-      );
-      _translationVector3.setValues(newOffset.dx, 0, 0);
-      transformState.value = Matrix4.compose(
-        _translationVector3,
-        _quaternionIdentity,
-        _scaleVector3,
-      );
-    });
-  }
-
-  void _onLeftUpdate(Offset offset) {
-    _transforming();
-    focusPosition.value?.let((rect) {
-      final scale = (rect.width - offset.dx) / rect.width;
-      _scaleVector3.setValues(
-        scale,
-        lockRatio.value ? scale : 1,
-        1,
-      );
-      _translationVector3.setValues(
-        offset.dx,
-        lockRatio.value ? (rect.width - rect.width * scale) / 2 : 0,
-        0,
-      );
-      transformState.value = Matrix4.compose(
-        _translationVector3,
-        _quaternionIdentity,
-        _scaleVector3,
-      );
-    });
-  }
-
-  void _transforming() {
-    transformingState.value = true;
-    hoverState.value = noPosition;
-    hoverPosition.value = null;
   }
 }
 

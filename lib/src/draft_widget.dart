@@ -8,6 +8,10 @@ part 'decoration_widget.dart';
 
 part 'transform_widget.dart';
 
+part 'resize_mixin.dart';
+
+part 'rotate_mixin.dart';
+
 /// No position index
 const noPosition = -1;
 
@@ -19,28 +23,34 @@ class DraftWidget extends StatelessWidget {
     ValueNotifier<int>? hoverState,
     ValueNotifier<int>? focusState,
     ValueNotifier<bool>? lockRatio,
+    ValueNotifier<bool>? rotate,
     this.onTransform,
     super.key,
   })  : _hoverState = hoverState ?? ValueNotifier(noPosition),
         _focusState = focusState ?? ValueNotifier(noPosition),
+        _rotate = rotate ?? ValueNotifier(true),
         _lockRatio = lockRatio ?? ValueNotifier(true);
 
   /// Widgets will be drafted.
   final Map<int, Map<String, dynamic>> sketch;
 
   /// Callback when end transforming.
-  final void Function(Rect)? onTransform;
+  final void Function(Rect, double)? onTransform;
 
   final ValueNotifier<int> _hoverState;
 
   final ValueNotifier<int> _focusState;
 
+  final ValueNotifier<bool> _rotate;
+
   final ValueNotifier<bool> _lockRatio;
 
   @override
   Widget build(BuildContext context) {
-    final hoverPosition = ValueNotifier<Rect?>(_position(_hoverState.value));
     final focusPosition = ValueNotifier<Rect?>(_position(_focusState.value));
+    final focusAngle = ValueNotifier<double>(_angle(_focusState.value));
+    final hoverPosition = ValueNotifier<Rect?>(_position(_hoverState.value));
+    final hoverAngle = ValueNotifier<double>(_angle(_hoverState.value));
     final controller = TransformationController();
     final scaleState = ValueNotifier<double>(1);
     final transformState = ValueNotifier<Matrix4>(Matrix4.identity());
@@ -65,19 +75,25 @@ class DraftWidget extends StatelessWidget {
                 id: e.key,
                 transformState: transformState,
                 focusPosition: focusPosition,
+                focusAngle: focusAngle,
                 focusState: _focusState,
                 hoverPosition: hoverPosition,
+                hoverAngle: hoverAngle,
                 hoverState: _hoverState,
                 transformingState: transformingState,
                 position: e.value['position'] as Rect,
+                angle: e.value['angle'] as double? ?? 0.0,
                 child: e.value['widget'] as Widget,
-                onEnd: () => onTransform?.call(
-                  transformState.value.transformRect(focusPosition.value!),
+                onEnd: () => _onTransform(
+                  transformState.value,
+                  focusPosition.value!,
+                  focusAngle.value,
                 ),
               ),
             ),
             _DecorationWidget(
               positionState: focusPosition,
+              angleState: focusAngle,
               scaleState: scaleState,
               transformState: transformState,
               color: Colors.white,
@@ -85,6 +101,7 @@ class DraftWidget extends StatelessWidget {
             ),
             _DecorationWidget(
               positionState: hoverPosition,
+              angleState: hoverAngle,
               scaleState: scaleState,
               transformState: transformState,
               color: Colors.orange,
@@ -92,6 +109,7 @@ class DraftWidget extends StatelessWidget {
             ),
             _ControlWidget(
               positionState: focusPosition,
+              angleState: focusAngle,
               scaleState: scaleState,
               transformingState: transformingState,
               hoverState: _hoverState,
@@ -99,8 +117,11 @@ class DraftWidget extends StatelessWidget {
               focusPosition: focusPosition,
               lockRatio: _lockRatio,
               transformState: transformState,
-              onEnd: () => onTransform?.call(
-                transformState.value.transformRect(focusPosition.value!),
+              rotateState: _rotate,
+              onEnd: () => _onTransform(
+                transformState.value,
+                focusPosition.value!,
+                focusAngle.value,
               ),
             ),
           ],
@@ -111,5 +132,34 @@ class DraftWidget extends StatelessWidget {
 
   Rect? _position(int key) {
     return sketch.containsKey(key) ? sketch[key]!['position'] as Rect : null;
+  }
+
+  double _angle(int key) => sketch[key]?['angle'] as double? ?? 0.0;
+
+  void _onTransform(Matrix4 matrix4, Rect rect, double angle) {
+    final transform = Matrix4.translationValues(
+      rect.left + rect.width / 2,
+      rect.top + rect.height / 2,
+      0,
+    )
+      ..rotateZ(angle)
+      ..translate(-rect.width / 2, -rect.height / 2)
+      ..multiply(matrix4)
+      ..translate(-rect.left, -rect.top);
+
+    final rotationZ = transform.getRotationZ();
+
+    debugPrint('angle=$angle, rotationZ=$rotationZ');
+    final center = rect.center;
+    onTransform?.call(
+      MatrixUtils.transformRect(
+        transform
+          ..translate(center.dx, center.dy)
+          ..rotateZ(-rotationZ)
+          ..translate(-center.dx, -center.dy),
+        rect,
+      ),
+      rotationZ,
+    );
   }
 }

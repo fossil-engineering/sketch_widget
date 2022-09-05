@@ -3,6 +3,7 @@ part of 'draft_widget.dart';
 class _DecorationWidget extends StatelessWidget {
   const _DecorationWidget({
     required this.positionState,
+    required this.angleState,
     required this.scaleState,
     required this.transformState,
     required this.color,
@@ -10,6 +11,7 @@ class _DecorationWidget extends StatelessWidget {
   });
 
   final ValueNotifier<Rect?> positionState;
+  final ValueNotifier<double> angleState;
   final ValueNotifier<double> scaleState;
   final ValueNotifier<Matrix4> transformState;
   final Color color;
@@ -25,16 +27,19 @@ class _DecorationWidget extends StatelessWidget {
           valueListenable: scaleState,
           builder: (_, scale, __) => Positioned.fromRect(
             rect: position,
-            child: IgnorePointer(
-              child: ValueListenableBuilder<Matrix4>(
-                valueListenable: transformState,
-                builder: (_, transform, __) => Transform(
-                  transform: transform,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: color,
-                        width: strokeWidth / scale,
+            child: Transform.rotate(
+              angle: angleState.value,
+              child: IgnorePointer(
+                child: ValueListenableBuilder<Matrix4>(
+                  valueListenable: transformState,
+                  builder: (_, transform, __) => Transform(
+                    transform: transform,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: color,
+                          width: strokeWidth / scale,
+                        ),
                       ),
                     ),
                   ),
@@ -53,10 +58,8 @@ class _ZeroPositioned extends StatelessWidget {
   const _ZeroPositioned();
 
   @override
-  Widget build(BuildContext context) {
-    return Positioned.fromRect(
-      rect: Rect.zero,
-      child: const SizedBox.shrink(),
-    );
-  }
+  Widget build(BuildContext context) => Positioned.fromRect(
+        rect: Rect.zero,
+        child: const SizedBox.shrink(),
+      );
 }

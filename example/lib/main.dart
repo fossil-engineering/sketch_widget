@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:draft_widget/draft_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -50,18 +52,22 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _lockRatio = ValueNotifier<bool>(true);
+  final _rotate = ValueNotifier<bool>(false);
   Map<int, Map<String, dynamic>> _sketch = {
     1: {
       'position': const Rect.fromLTWH(100, 100, 100, 100),
-      'widget': const ColoredBox(color: Colors.red)
+      'widget': const ColoredBox(color: Colors.red),
+      'angle': pi / 2,
     },
     2: {
-      'position': const Rect.fromLTWH(150, 150, 100, 100),
-      'widget': const ColoredBox(color: Colors.yellow)
+      'position': const Rect.fromLTWH(150, 150, 304, 304),
+      'widget': Image.asset('images/ending_dash.png', fit: BoxFit.cover),
+      'angle': pi / 4,
     },
     3: {
       'position': const Rect.fromLTWH(200, 200, 100, 100),
-      'widget': const ColoredBox(color: Colors.blue)
+      'widget': const ColoredBox(color: Colors.blue),
+      'angle': 0.0,
     },
   };
 
@@ -93,6 +99,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
             ),
+          ),
+          IconButton(
+            onPressed: () => _rotate.value ^= true,
+            icon: ValueListenableBuilder<bool>(
+              valueListenable: _rotate,
+              builder: (_, rotate, __) {
+                return Icon(
+                  Icons.rotate_left,
+                  color: rotate ? Colors.black : Colors.grey,
+                );
+              },
+            ),
           )
         ],
       ),
@@ -100,13 +118,17 @@ class _MyHomePageState extends State<MyHomePage> {
         focusState: _focus,
         lockRatio: _lockRatio,
         sketch: _sketch,
-        onTransform: (rect) {
+        rotate: _rotate,
+        onTransform: (rect, angle) {
           setState(() {
             _sketch = _sketch.map((id, widget) => MapEntry(
                 id,
                 id == _focus.value
-                    ? widget.map((key, value) =>
-                        MapEntry(key, key == 'position' ? rect : value))
+                    ? Map.fromEntries({
+                        ...widget.entries,
+                        MapEntry('position', rect),
+                        MapEntry('angle', angle),
+                      })
                     : widget));
           });
         },

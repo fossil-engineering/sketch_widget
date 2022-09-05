@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 /// ObjectExt provides let function like kotlin
 extension ObjectExt<T> on T {
   /// let allow invoke function with this object
-  R let<R>(R Function(T that) op) => op(this);
+  R let<R>(R Function(T it) op) => op(this);
 }
 
 /// Matrix4Ext provides some utilities
@@ -36,15 +36,9 @@ extension Matrix4Ext on Matrix4 {
         ),
       );
 
-  /// Return transformed rect
-  Rect transformRect(Rect rect) => getTranslation().let(
-        (translation) => Rect.fromLTWH(
-          rect.left + translation[0],
-          rect.top + translation[1],
-          rect.width * getScaleX(),
-          rect.height * getScaleY(),
-        ),
-      );
+  /// rotationZ of transform
+  double getRotationZ() => getRotation()
+      .let((vector3) => atan2(vector3.storage[1], vector3.storage[0]));
 }
 
 /// OffsetExt provides some calculation
@@ -54,5 +48,12 @@ extension OffsetExt on Offset {
     final x = (dx * vector.width + dy * vector.height) /
         (vector.width + vector.height * vector.height / vector.width);
     return Offset(x, x * vector.height / vector.width);
+  }
+
+  /// angle of 3 points
+  double angle(Offset p1, Offset p2) {
+    final o1 = this - p1;
+    final o2 = this - p2;
+    return atan2(o1.dx * o2.dy - o1.dy * o2.dx, o1.dx * o2.dx + o1.dy * o2.dy);
   }
 }
