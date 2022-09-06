@@ -65,9 +65,7 @@ class DraftWidget extends StatelessWidget {
       },
       child: InteractiveViewer(
         transformationController: controller,
-        onInteractionUpdate: (_) {
-          scaleState.value = controller.value.getScaleX();
-        },
+        onInteractionUpdate: (_) => scaleState.value = controller.value.scaleX,
         child: Stack(
           children: [
             ...sketch.entries.map(
@@ -150,10 +148,10 @@ class DraftWidget extends StatelessWidget {
     onTransform?.call(
       Rect.fromCenter(
         center: MatrixUtils.transformPoint(transform, rect.center),
-        width: rect.width * transform.getScaleX(),
-        height: rect.height * transform.getScaleY(),
+        width: rect.width * transform.scaleX,
+        height: rect.height * transform.scaleY,
       ),
-      transform.getRotationZ(),
+      transform.rotationZ,
     );
   }
 }

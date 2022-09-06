@@ -67,8 +67,8 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
                         children: [
                           _PositionedWidget(
                             center: Offset.zero,
-                            scaleX: scale * transform.getScaleX(),
-                            scaleY: scale * transform.getScaleY(),
+                            scaleX: scale * transform.scaleX,
+                            scaleY: scale * transform.scaleY,
                             cursor: rotate
                                 ? SystemMouseCursors.grab
                                 : _cursors[startIndex % 8],
@@ -78,8 +78,8 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
                           ),
                           _PositionedWidget(
                             center: Offset(position.width / 2, 0),
-                            scaleX: scale * transform.getScaleX(),
-                            scaleY: scale * transform.getScaleY(),
+                            scaleX: scale * transform.scaleX,
+                            scaleY: scale * transform.scaleY,
                             cursor: rotate
                                 ? SystemMouseCursors.grab
                                 : _cursors[(startIndex + 1) % 8],
@@ -88,8 +88,8 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
                           ),
                           _PositionedWidget(
                             center: Offset(position.width, 0),
-                            scaleX: scale * transform.getScaleX(),
-                            scaleY: scale * transform.getScaleY(),
+                            scaleX: scale * transform.scaleX,
+                            scaleY: scale * transform.scaleY,
                             cursor: rotate
                                 ? SystemMouseCursors.grab
                                 : _cursors[(startIndex + 2) % 8],
@@ -99,8 +99,8 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
                           ),
                           _PositionedWidget(
                             center: Offset(position.width, position.height / 2),
-                            scaleX: scale * transform.getScaleX(),
-                            scaleY: scale * transform.getScaleY(),
+                            scaleX: scale * transform.scaleX,
+                            scaleY: scale * transform.scaleY,
                             cursor: rotate
                                 ? SystemMouseCursors.grab
                                 : _cursors[(startIndex + 3) % 8],
@@ -109,8 +109,8 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
                           ),
                           _PositionedWidget(
                             center: Offset(position.width, position.height),
-                            scaleX: scale * transform.getScaleX(),
-                            scaleY: scale * transform.getScaleY(),
+                            scaleX: scale * transform.scaleX,
+                            scaleY: scale * transform.scaleY,
                             cursor: rotate
                                 ? SystemMouseCursors.grab
                                 : _cursors[(startIndex + 4) % 8],
@@ -121,8 +121,8 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
                           ),
                           _PositionedWidget(
                             center: Offset(position.width / 2, position.height),
-                            scaleX: scale * transform.getScaleX(),
-                            scaleY: scale * transform.getScaleY(),
+                            scaleX: scale * transform.scaleX,
+                            scaleY: scale * transform.scaleY,
                             cursor: rotate
                                 ? SystemMouseCursors.grab
                                 : _cursors[(startIndex + 5) % 8],
@@ -132,8 +132,8 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
                           ),
                           _PositionedWidget(
                             center: Offset(0, position.height),
-                            scaleX: scale * transform.getScaleX(),
-                            scaleY: scale * transform.getScaleY(),
+                            scaleX: scale * transform.scaleX,
+                            scaleY: scale * transform.scaleY,
                             cursor: rotate
                                 ? SystemMouseCursors.grab
                                 : _cursors[(startIndex + 6) % 8],
@@ -144,8 +144,8 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
                           ),
                           _PositionedWidget(
                             center: Offset(0, position.height / 2),
-                            scaleX: scale * transform.getScaleX(),
-                            scaleY: scale * transform.getScaleY(),
+                            scaleX: scale * transform.scaleX,
+                            scaleY: scale * transform.scaleY,
                             cursor: rotate
                                 ? SystemMouseCursors.grab
                                 : _cursors[(startIndex + 7) % 8],

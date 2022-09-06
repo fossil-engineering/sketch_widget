@@ -11,21 +11,21 @@ extension ObjectExt<T> on T {
 /// Matrix4Ext provides some utilities
 extension Matrix4Ext on Matrix4 {
   /// Returns the scale value of the X axe.
-  double getScaleX() => sqrt(
+  double get scaleX => sqrt(
         storage[0] * storage[0] +
             storage[1] * storage[1] +
             storage[2] * storage[2],
       );
 
   /// Returns the scale value of the Y axe.
-  double getScaleY() => sqrt(
+  double get scaleY => sqrt(
         storage[4] * storage[4] +
             storage[5] * storage[5] +
             storage[6] * storage[6],
       );
 
   /// Returns the scale value of the XY axes.
-  double getScaleXY() => sqrt(
+  double get scaleXY => sqrt(
         max(
           storage[0] * storage[0] +
               storage[1] * storage[1] +
@@ -37,8 +37,7 @@ extension Matrix4Ext on Matrix4 {
       );
 
   /// rotationZ of transform
-  double getRotationZ() => getRotation()
-      .let((vector3) => atan2(vector3.storage[1], vector3.storage[0]));
+  double get rotationZ => atan2(storage[1], storage[0]);
 }
 
 /// OffsetExt provides some calculation
