@@ -147,18 +147,13 @@ class DraftWidget extends StatelessWidget {
       ..multiply(matrix4)
       ..translate(-rect.left, -rect.top);
 
-    final rotationZ = transform.getRotationZ();
-
-    final center = rect.center;
     onTransform?.call(
-      MatrixUtils.transformRect(
-        transform
-          ..translate(center.dx, center.dy)
-          ..rotateZ(-rotationZ)
-          ..translate(-center.dx, -center.dy),
-        rect,
+      Rect.fromCenter(
+        center: MatrixUtils.transformPoint(transform, rect.center),
+        width: rect.width * transform.getScaleX(),
+        height: rect.height * transform.getScaleY(),
       ),
-      rotationZ,
+      transform.getRotationZ(),
     );
   }
 }
