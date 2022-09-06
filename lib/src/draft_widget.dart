@@ -149,7 +149,6 @@ class DraftWidget extends StatelessWidget {
 
     final rotationZ = transform.getRotationZ();
 
-    debugPrint('angle=$angle, rotationZ=$rotationZ');
     final center = rect.center;
     onTransform?.call(
       MatrixUtils.transformRect(

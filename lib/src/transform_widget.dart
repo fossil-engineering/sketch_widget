@@ -53,7 +53,9 @@ class _TransformWidget extends StatelessWidget {
             transformState.value = Matrix4.copy(transformState.value)
               ..translate(details.delta.dx, details.delta.dy);
           },
-          onPanEnd: (_) => onEnd(),
+          onPanEnd: (_) {
+            if (id == focusState.value) onEnd();
+          },
           child: ValueListenableBuilder<Matrix4>(
             valueListenable: transformState,
             builder: (_, transform, child) {
