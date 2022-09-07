@@ -21,7 +21,7 @@ Flutter widget to draft widgets
 
 ```yaml
 dependencies:
-  draft_widget: ^1.1.0
+  draft_widget: ^1.2.0
 ```
 
 ## Usage
