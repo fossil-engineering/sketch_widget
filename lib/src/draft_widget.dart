@@ -6,11 +6,11 @@ part 'control_widget.dart';
 
 part 'decoration_widget.dart';
 
-part 'transform_widget.dart';
-
 part 'resize_mixin.dart';
 
 part 'rotate_mixin.dart';
+
+part 'transform_widget.dart';
 
 /// No position index
 const noPosition = -1;
@@ -68,27 +68,29 @@ class DraftWidget extends StatelessWidget {
         onInteractionUpdate: (_) => scaleState.value = controller.value.scaleX,
         child: Stack(
           children: [
-            ...sketch.entries.map(
-              (e) => _TransformWidget(
-                id: e.key,
-                transformState: transformState,
-                focusPosition: focusPosition,
-                focusAngle: focusAngle,
-                focusState: _focusState,
-                hoverPosition: hoverPosition,
-                hoverAngle: hoverAngle,
-                hoverState: _hoverState,
-                transformingState: transformingState,
-                position: e.value['position'] as Rect,
-                angle: e.value['angle'] as double? ?? 0.0,
-                child: e.value['widget'] as Widget,
-                onEnd: () => _onTransform(
-                  transformState.value,
-                  focusPosition.value!,
-                  focusAngle.value,
+            ...sketch.entries
+                .where((element) => element.value['visibility'] != false)
+                .map(
+                  (e) => _TransformWidget(
+                    id: e.key,
+                    transformState: transformState,
+                    focusPosition: focusPosition,
+                    focusAngle: focusAngle,
+                    focusState: _focusState,
+                    hoverPosition: hoverPosition,
+                    hoverAngle: hoverAngle,
+                    hoverState: _hoverState,
+                    transformingState: transformingState,
+                    position: e.value['position'] as Rect,
+                    angle: e.value['angle'] as double? ?? 0.0,
+                    child: e.value['widget'] as Widget,
+                    onEnd: () => _onTransform(
+                      transformState.value,
+                      focusPosition.value!,
+                      focusAngle.value,
+                    ),
+                  ),
                 ),
-              ),
-            ),
             _DecorationWidget(
               positionState: focusPosition,
               angleState: focusAngle,

@@ -7,18 +7,18 @@ Flutter widget to draft widgets
 [very_good_analysis_badge]: https://img.shields.io/badge/style-very_good_analysis-B22C89.svg
 [very_good_analysis_link]: https://pub.dev/packages/very_good_analysis
 
-
 ## Features
 
 - Translate
 - Scale
 - Rotate
+- Visibility
 
 ## Getting started
 
 ```yaml
 dependencies:
-  draft_widget: ^1.0.0
+  draft_widget: ^1.1.0
 ```
 
 ## Usage
@@ -26,10 +26,24 @@ dependencies:
 ```dart
 DraftWidget(
     sketch: {
+        2: {
+            'position': const Rect.fromLTWH(100, 100, 100, 100),
+            'widget': const ColoredBox(color: Colors.red),
+            'angle': pi / 2,
+        },
         1: {
-            'position': const Rect.fromLTWH(150, 150, 304, 304),
-            'widget': Image.asset('images/ending_dash.png', fit: BoxFit.cover),
+            'position': const Rect.fromLTWH(150, 150, 200, 200),
+            'widget': Image.asset('images/ending_dash.png'),
             'angle': pi / 4,
+        },
+        3: {
+            'position': const Rect.fromLTWH(200, 200, 50, 50),
+            'widget': const ColoredBox(color: Colors.blue),
+        },
+        4: {
+            'position': const Rect.fromLTWH(200, 200, 50, 50),
+            'widget': const ColoredBox(color: Colors.blue),
+            'visibility': false,
         },
     },
 );
