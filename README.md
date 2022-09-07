@@ -1,5 +1,7 @@
 # draft_widget
 
+![Build](https://github.com/fossil-engineering/draft_widget/workflows/CI/badge.svg)
+[![pub package](https://img.shields.io/pub/v/draft_widget.svg)](https://pub.dev/packages/draft_widget)
 [![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link]
 
 Flutter widget to draft widgets
@@ -13,12 +15,13 @@ Flutter widget to draft widgets
 - Scale
 - Rotate
 - Visibility
+- Lock
 
 ## Getting started
 
 ```yaml
 dependencies:
-  draft_widget: ^1.1.0
+  draft_widget: ^1.2.0
 ```
 
 ## Usage
@@ -39,10 +42,11 @@ DraftWidget(
         3: {
             'position': const Rect.fromLTWH(200, 200, 50, 50),
             'widget': const ColoredBox(color: Colors.blue),
+            'lock': true,
         },
         4: {
-            'position': const Rect.fromLTWH(200, 200, 50, 50),
-            'widget': const ColoredBox(color: Colors.blue),
+            'position': const Rect.fromLTWH(250, 250, 50, 50),
+            'widget': const ColoredBox(color: Colors.yellow),
             'visibility': false,
         },
     },

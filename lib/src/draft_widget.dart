@@ -55,6 +55,9 @@ class DraftWidget extends StatelessWidget {
     final scaleState = ValueNotifier<double>(1);
     final transformState = ValueNotifier<Matrix4>(Matrix4.identity());
     final transformingState = ValueNotifier<bool>(false);
+    final lockFocus = ValueNotifier<bool>(
+      sketch[_focusState.value]?.let((it) => it['lock'] as bool?) ?? false,
+    );
 
     return GestureDetector(
       onTap: () {
@@ -83,12 +86,14 @@ class DraftWidget extends StatelessWidget {
                     transformingState: transformingState,
                     position: e.value['position'] as Rect,
                     angle: e.value['angle'] as double? ?? 0.0,
-                    child: e.value['widget'] as Widget,
+                    lock: e.value['lock'] as bool? ?? false,
+                    lockFocus: lockFocus,
                     onEnd: () => _onTransform(
                       transformState.value,
                       focusPosition.value!,
                       focusAngle.value,
                     ),
+                    child: e.value['widget'] as Widget,
                   ),
                 ),
             _DecorationWidget(
@@ -116,6 +121,7 @@ class DraftWidget extends StatelessWidget {
               hoverPosition: hoverPosition,
               focusPosition: focusPosition,
               lockRatio: _lockRatio,
+              lockFocus: lockFocus,
               transformState: transformState,
               rotateState: _rotate,
               onEnd: () => _onTransform(

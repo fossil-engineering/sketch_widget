@@ -13,8 +13,10 @@ class _TransformWidget extends StatelessWidget {
     required this.transformingState,
     required this.position,
     required this.angle,
-    required this.child,
+    required this.lock,
+    required this.lockFocus,
     required this.onEnd,
+    required this.child,
   });
 
   final int id;
@@ -26,10 +28,12 @@ class _TransformWidget extends StatelessWidget {
   final ValueNotifier<double> hoverAngle;
   final ValueNotifier<int> hoverState;
   final ValueNotifier<bool> transformingState;
+  final ValueNotifier<bool> lockFocus;
   final Rect position;
   final double angle;
-  final Widget child;
+  final bool lock;
   final VoidCallback onEnd;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -43,19 +47,24 @@ class _TransformWidget extends StatelessWidget {
               focusState.value = id;
               focusPosition.value = position;
               focusAngle.value = angle;
+              lockFocus.value = lock;
             }
           },
-          onPanUpdate: (details) {
-            if (id != focusState.value) return;
-            transformingState.value = true;
-            hoverState.value = noPosition;
-            hoverPosition.value = null;
-            transformState.value = Matrix4.copy(transformState.value)
-              ..translate(details.delta.dx, details.delta.dy);
-          },
-          onPanEnd: (_) {
-            if (id == focusState.value) onEnd();
-          },
+          onPanUpdate: lock
+              ? null
+              : (details) {
+                  if (id != focusState.value) return;
+                  transformingState.value = true;
+                  hoverState.value = noPosition;
+                  hoverPosition.value = null;
+                  transformState.value = Matrix4.copy(transformState.value)
+                    ..translate(details.delta.dx, details.delta.dy);
+                },
+          onPanEnd: lock
+              ? null
+              : (_) {
+                  if (id == focusState.value) onEnd();
+                },
           child: ValueListenableBuilder<Matrix4>(
             valueListenable: transformState,
             builder: (_, transform, child) {
@@ -67,7 +76,8 @@ class _TransformWidget extends StatelessWidget {
               child: child,
               onEnter: (_) {
                 if (hoverState.value != id &&
-                    hoverState.value != focusState.value &&
+                    (hoverState.value != focusState.value ||
+                        hoverState.value == noPosition) &&
                     !transformingState.value) {
                   hoverState.value = id;
                   hoverPosition.value = position;
