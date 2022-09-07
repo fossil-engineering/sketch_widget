@@ -1,3 +1,8 @@
+## 1.2.0
+
+* Lock design.
+* Fix bug not hover while no focus.
+
 ## 1.1.0
 
 * Support visibility.

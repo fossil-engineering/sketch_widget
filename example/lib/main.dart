@@ -67,10 +67,11 @@ class _MyHomePageState extends State<MyHomePage> {
     3: {
       'position': const Rect.fromLTWH(200, 200, 50, 50),
       'widget': const ColoredBox(color: Colors.blue),
+      'lock': true,
     },
     4: {
-      'position': const Rect.fromLTWH(200, 200, 50, 50),
-      'widget': const ColoredBox(color: Colors.blue),
+      'position': const Rect.fromLTWH(250, 250, 50, 50),
+      'widget': const ColoredBox(color: Colors.yellow),
       'visibility': false,
     },
   };
@@ -118,24 +119,77 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      body: DraftWidget(
-        focusState: _focus,
-        lockRatio: _lockRatio,
-        sketch: _sketch,
-        rotate: _rotate,
-        onTransform: (rect, angle) {
-          setState(() {
-            _sketch = _sketch.map((id, widget) => MapEntry(
-                id,
-                id == _focus.value
-                    ? Map.fromEntries({
-                        ...widget.entries,
-                        MapEntry('position', rect),
-                        MapEntry('angle', angle),
-                      })
-                    : widget));
-          });
-        },
+      body: Row(
+        children: [
+          Flexible(
+            flex: 9,
+            child: DraftWidget(
+              focusState: _focus,
+              lockRatio: _lockRatio,
+              sketch: _sketch,
+              rotate: _rotate,
+              onTransform: (rect, angle) {
+                setState(() {
+                  _sketch = _sketch.map((id, widget) => MapEntry(
+                      id,
+                      id == _focus.value
+                          ? Map.fromEntries({
+                              ...widget.entries,
+                              MapEntry('position', rect),
+                              MapEntry('angle', angle),
+                            })
+                          : widget));
+                });
+              },
+            ),
+          ),
+          Container(
+            width: 160,
+            color: Colors.white,
+            child: ListView.builder(
+              itemBuilder: (_, index) {
+                final entry = _sketch.entries.elementAt(index);
+                final visibility = entry.value['visibility'] as bool? ?? true;
+                final lock = entry.value['lock'] as bool? ?? false;
+                return ListTile(
+                  leading: IconButton(
+                    icon: Icon(lock ? Icons.lock : Icons.lock_open),
+                    onPressed: () {
+                      setState(() {
+                        _sketch = _sketch.map((id, widget) => MapEntry(
+                            id,
+                            id == entry.key
+                                ? Map.fromEntries({
+                                    ...widget.entries,
+                                    MapEntry('lock', !lock)
+                                  })
+                                : widget));
+                      });
+                    },
+                  ),
+                  title: Text('${entry.key}'),
+                  trailing: IconButton(
+                    icon: Icon(
+                        visibility ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _sketch = _sketch.map((id, widget) => MapEntry(
+                            id,
+                            id == entry.key
+                                ? Map.fromEntries({
+                                    ...widget.entries,
+                                    MapEntry('visibility', !visibility)
+                                  })
+                                : widget));
+                      });
+                    },
+                  ),
+                );
+              },
+              itemCount: _sketch.length,
+            ),
+          )
+        ],
       ),
     );
   }

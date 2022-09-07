@@ -22,6 +22,7 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
     required ValueNotifier<Rect?> focusPosition,
     required ValueNotifier<bool> lockRatio,
     required ValueNotifier<Matrix4> transformState,
+    required this.lockFocus,
     required this.rotateState,
     required this.onEnd,
   }) {
@@ -37,134 +38,148 @@ class _ControlWidget extends StatelessWidget with _Resize, _Rotate {
   final ValueNotifier<double> angleState;
   final ValueNotifier<double> scaleState;
   final ValueNotifier<bool> rotateState;
+  final ValueNotifier<bool> lockFocus;
   final void Function() onEnd;
 
   @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<Rect?>(
-      valueListenable: positionState,
-      builder: (_, position, child) {
-        if (position == null) return child!;
-        return ValueListenableBuilder<double>(
-          valueListenable: scaleState,
-          builder: (_, scale, __) => Positioned.fromRect(
-            rect: position,
-            child: ValueListenableBuilder<bool>(
-              valueListenable: rotateState,
-              builder: (_, rotate, __) => ValueListenableBuilder<Matrix4>(
-                valueListenable: transformState,
-                builder: (_, transform, __) {
-                  final angle = angleState.value;
-                  final startIndex = rotate
-                      ? 0
-                      : (((degrees(angle) % 360 + 360) % 360) ~/ 22.5 + 1) ~/ 2;
-                  return Transform.rotate(
-                    angle: angle,
-                    child: Transform(
-                      transform: transform,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          _PositionedWidget(
-                            center: Offset.zero,
-                            scaleX: scale * transform.scaleX,
-                            scaleY: scale * transform.scaleY,
-                            cursor: rotate
-                                ? SystemMouseCursors.grab
-                                : _cursors[startIndex % 8],
-                            onUpdate:
-                                rotate ? _onTopLeftRotate : _onTopLeftResize,
-                            onEnd: onEnd,
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+        valueListenable: lockFocus,
+        builder: (_, lockFocus, child) {
+          if (lockFocus) return const _ZeroPositioned();
+          return child!;
+        },
+        child: ValueListenableBuilder<Rect?>(
+          valueListenable: positionState,
+          builder: (_, position, child) {
+            if (position == null) return child!;
+            return ValueListenableBuilder<double>(
+              valueListenable: scaleState,
+              builder: (_, scale, __) => Positioned.fromRect(
+                rect: position,
+                child: ValueListenableBuilder<bool>(
+                  valueListenable: rotateState,
+                  builder: (_, rotate, __) => ValueListenableBuilder<Matrix4>(
+                    valueListenable: transformState,
+                    builder: (_, transform, __) {
+                      final angle = angleState.value;
+                      final startIndex = rotate
+                          ? 0
+                          : (((degrees(angle) % 360 + 360) % 360) ~/ 22.5 +
+                                  1) ~/
+                              2;
+                      return Transform.rotate(
+                        angle: angle,
+                        child: Transform(
+                          transform: transform,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              _PositionedWidget(
+                                center: Offset.zero,
+                                scaleX: scale * transform.scaleX,
+                                scaleY: scale * transform.scaleY,
+                                cursor: rotate
+                                    ? SystemMouseCursors.grab
+                                    : _cursors[startIndex % 8],
+                                onUpdate: rotate
+                                    ? _onTopLeftRotate
+                                    : _onTopLeftResize,
+                                onEnd: onEnd,
+                              ),
+                              _PositionedWidget(
+                                center: Offset(position.width / 2, 0),
+                                scaleX: scale * transform.scaleX,
+                                scaleY: scale * transform.scaleY,
+                                cursor: rotate
+                                    ? SystemMouseCursors.grab
+                                    : _cursors[(startIndex + 1) % 8],
+                                onUpdate: rotate ? _onTopRotate : _onTopResize,
+                                onEnd: onEnd,
+                              ),
+                              _PositionedWidget(
+                                center: Offset(position.width, 0),
+                                scaleX: scale * transform.scaleX,
+                                scaleY: scale * transform.scaleY,
+                                cursor: rotate
+                                    ? SystemMouseCursors.grab
+                                    : _cursors[(startIndex + 2) % 8],
+                                onUpdate: rotate
+                                    ? _onTopRightRotate
+                                    : _onTopRightResize,
+                                onEnd: onEnd,
+                              ),
+                              _PositionedWidget(
+                                center:
+                                    Offset(position.width, position.height / 2),
+                                scaleX: scale * transform.scaleX,
+                                scaleY: scale * transform.scaleY,
+                                cursor: rotate
+                                    ? SystemMouseCursors.grab
+                                    : _cursors[(startIndex + 3) % 8],
+                                onUpdate:
+                                    rotate ? _onRightRotate : _onRightResize,
+                                onEnd: onEnd,
+                              ),
+                              _PositionedWidget(
+                                center: Offset(position.width, position.height),
+                                scaleX: scale * transform.scaleX,
+                                scaleY: scale * transform.scaleY,
+                                cursor: rotate
+                                    ? SystemMouseCursors.grab
+                                    : _cursors[(startIndex + 4) % 8],
+                                onUpdate: rotate
+                                    ? _onBottomRightRotate
+                                    : _onBottomRightResize,
+                                onEnd: onEnd,
+                              ),
+                              _PositionedWidget(
+                                center:
+                                    Offset(position.width / 2, position.height),
+                                scaleX: scale * transform.scaleX,
+                                scaleY: scale * transform.scaleY,
+                                cursor: rotate
+                                    ? SystemMouseCursors.grab
+                                    : _cursors[(startIndex + 5) % 8],
+                                onUpdate:
+                                    rotate ? _onBottomRotate : _onBottomResize,
+                                onEnd: onEnd,
+                              ),
+                              _PositionedWidget(
+                                center: Offset(0, position.height),
+                                scaleX: scale * transform.scaleX,
+                                scaleY: scale * transform.scaleY,
+                                cursor: rotate
+                                    ? SystemMouseCursors.grab
+                                    : _cursors[(startIndex + 6) % 8],
+                                onUpdate: rotate
+                                    ? _onBottomLeftRotate
+                                    : _onBottomLeftResize,
+                                onEnd: onEnd,
+                              ),
+                              _PositionedWidget(
+                                center: Offset(0, position.height / 2),
+                                scaleX: scale * transform.scaleX,
+                                scaleY: scale * transform.scaleY,
+                                cursor: rotate
+                                    ? SystemMouseCursors.grab
+                                    : _cursors[(startIndex + 7) % 8],
+                                onUpdate:
+                                    rotate ? _onLeftRotate : _onLeftResize,
+                                onEnd: onEnd,
+                              ),
+                            ],
                           ),
-                          _PositionedWidget(
-                            center: Offset(position.width / 2, 0),
-                            scaleX: scale * transform.scaleX,
-                            scaleY: scale * transform.scaleY,
-                            cursor: rotate
-                                ? SystemMouseCursors.grab
-                                : _cursors[(startIndex + 1) % 8],
-                            onUpdate: rotate ? _onTopRotate : _onTopResize,
-                            onEnd: onEnd,
-                          ),
-                          _PositionedWidget(
-                            center: Offset(position.width, 0),
-                            scaleX: scale * transform.scaleX,
-                            scaleY: scale * transform.scaleY,
-                            cursor: rotate
-                                ? SystemMouseCursors.grab
-                                : _cursors[(startIndex + 2) % 8],
-                            onUpdate:
-                                rotate ? _onTopRightRotate : _onTopRightResize,
-                            onEnd: onEnd,
-                          ),
-                          _PositionedWidget(
-                            center: Offset(position.width, position.height / 2),
-                            scaleX: scale * transform.scaleX,
-                            scaleY: scale * transform.scaleY,
-                            cursor: rotate
-                                ? SystemMouseCursors.grab
-                                : _cursors[(startIndex + 3) % 8],
-                            onUpdate: rotate ? _onRightRotate : _onRightResize,
-                            onEnd: onEnd,
-                          ),
-                          _PositionedWidget(
-                            center: Offset(position.width, position.height),
-                            scaleX: scale * transform.scaleX,
-                            scaleY: scale * transform.scaleY,
-                            cursor: rotate
-                                ? SystemMouseCursors.grab
-                                : _cursors[(startIndex + 4) % 8],
-                            onUpdate: rotate
-                                ? _onBottomRightRotate
-                                : _onBottomRightResize,
-                            onEnd: onEnd,
-                          ),
-                          _PositionedWidget(
-                            center: Offset(position.width / 2, position.height),
-                            scaleX: scale * transform.scaleX,
-                            scaleY: scale * transform.scaleY,
-                            cursor: rotate
-                                ? SystemMouseCursors.grab
-                                : _cursors[(startIndex + 5) % 8],
-                            onUpdate:
-                                rotate ? _onBottomRotate : _onBottomResize,
-                            onEnd: onEnd,
-                          ),
-                          _PositionedWidget(
-                            center: Offset(0, position.height),
-                            scaleX: scale * transform.scaleX,
-                            scaleY: scale * transform.scaleY,
-                            cursor: rotate
-                                ? SystemMouseCursors.grab
-                                : _cursors[(startIndex + 6) % 8],
-                            onUpdate: rotate
-                                ? _onBottomLeftRotate
-                                : _onBottomLeftResize,
-                            onEnd: onEnd,
-                          ),
-                          _PositionedWidget(
-                            center: Offset(0, position.height / 2),
-                            scaleX: scale * transform.scaleX,
-                            scaleY: scale * transform.scaleY,
-                            cursor: rotate
-                                ? SystemMouseCursors.grab
-                                : _cursors[(startIndex + 7) % 8],
-                            onUpdate: rotate ? _onLeftRotate : _onLeftResize,
-                            onEnd: onEnd,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
-          ),
-        );
-      },
-      child: const _ZeroPositioned(),
-    );
-  }
+            );
+          },
+          child: const _ZeroPositioned(),
+        ),
+      );
 }
 
 class _PositionedWidget extends StatelessWidget {
