@@ -1,3 +1,4 @@
+import 'package:draft_widget/draft_widget.dart';
 import 'package:draft_widget/src/util.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
@@ -14,6 +15,9 @@ part 'transform_widget.dart';
 
 /// No position index
 const noPosition = -1;
+
+/// Callback when the transformation done with focusId and their info
+typedef OnTransform = void Function(int, Rect, double);
 
 /// DraftWidget to draft widgets
 class DraftWidget extends StatelessWidget {
@@ -32,10 +36,10 @@ class DraftWidget extends StatelessWidget {
         _lockRatio = lockRatio ?? ValueNotifier(true);
 
   /// Widgets will be drafted.
-  final Map<int, Map<String, dynamic>> sketch;
+  final Map<int, Map<Component, dynamic>> sketch;
 
   /// Callback when end transforming.
-  final void Function(Rect, double)? onTransform;
+  final OnTransform? onTransform;
 
   final ValueNotifier<int> _hoverState;
 
@@ -154,6 +158,7 @@ class DraftWidget extends StatelessWidget {
       ..translate(-rect.left, -rect.top);
 
     onTransform?.call(
+      _focusState.value,
       Rect.fromCenter(
         center: MatrixUtils.transformPoint(transform, rect.center),
         width: rect.width * transform.scaleX,
