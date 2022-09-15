@@ -55,24 +55,24 @@ class _MyHomePageState extends State<MyHomePage> {
   final _rotate = ValueNotifier<bool>(false);
   var _sketch = {
     2: {
-      'position': const Rect.fromLTWH(100, 100, 100, 100),
-      'widget': const ColoredBox(color: Colors.red),
-      'angle': pi / 2,
+      Component.position: const Rect.fromLTWH(100, 100, 100, 100),
+      Component.widget: const ColoredBox(color: Colors.red),
+      Component.angle: pi / 2,
     },
     1: {
-      'position': const Rect.fromLTWH(150, 150, 200, 200),
-      'widget': Image.asset('images/ending_dash.png'),
-      'angle': pi / 4,
+      Component.position: const Rect.fromLTWH(150, 150, 200, 200),
+      Component.widget: Image.asset('images/ending_dash.png'),
+      Component.angle: pi / 4,
     },
     3: {
-      'position': const Rect.fromLTWH(200, 200, 50, 50),
-      'widget': const ColoredBox(color: Colors.blue),
-      'lock': true,
+      Component.position: const Rect.fromLTWH(200, 200, 50, 50),
+      Component.widget: const ColoredBox(color: Colors.blue),
+      Component.lock: true,
     },
     4: {
-      'position': const Rect.fromLTWH(250, 250, 50, 50),
-      'widget': const ColoredBox(color: Colors.yellow),
-      'visibility': false,
+      Component.position: const Rect.fromLTWH(250, 250, 50, 50),
+      Component.widget: const ColoredBox(color: Colors.yellow),
+      Component.visibility: false,
     },
   };
 
@@ -128,17 +128,17 @@ class _MyHomePageState extends State<MyHomePage> {
               lockRatio: _lockRatio,
               sketch: _sketch,
               rotate: _rotate,
-              onTransform: (rect, angle) {
+              onTransform: (id, rect, angle) {
                 setState(() {
-                  _sketch = _sketch.map((id, widget) => MapEntry(
-                      id,
-                      id == _focus.value
+                  _sketch = _sketch.map((key, value) => MapEntry(
+                      key,
+                      id == id
                           ? Map.fromEntries({
-                              ...widget.entries,
-                              MapEntry('position', rect),
-                              MapEntry('angle', angle),
+                              ...value.entries,
+                              MapEntry(Component.position, rect),
+                              MapEntry(Component.angle, angle),
                             })
-                          : widget));
+                          : value));
                 });
               },
             ),
@@ -149,8 +149,8 @@ class _MyHomePageState extends State<MyHomePage> {
             child: ListView.builder(
               itemBuilder: (_, index) {
                 final entry = _sketch.entries.elementAt(index);
-                final visibility = entry.value['visibility'] as bool? ?? true;
-                final lock = entry.value['lock'] as bool? ?? false;
+                final visibility = entry.value[Component.visibility] as bool? ?? true;
+                final lock = entry.value[Component.lock] as bool? ?? false;
                 return ListTile(
                   leading: IconButton(
                     icon: Icon(lock ? Icons.lock : Icons.lock_open),
@@ -161,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             id == entry.key
                                 ? Map.fromEntries({
                                     ...widget.entries,
-                                    MapEntry('lock', !lock)
+                                    MapEntry(Component.lock, !lock)
                                   })
                                 : widget));
                       });
@@ -178,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             id == entry.key
                                 ? Map.fromEntries({
                                     ...widget.entries,
-                                    MapEntry('visibility', !visibility)
+                                    MapEntry(Component.visibility, !visibility)
                                   })
                                 : widget));
                       });

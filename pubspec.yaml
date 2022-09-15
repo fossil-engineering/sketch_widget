@@ -1,6 +1,6 @@
 name: draft_widget
 description: Flutter widget to draft widgets, transform their position, scale and rotation.
-version: 1.2.0
+version: 1.2.1
 homepage: https://github.com/fossil-engineering/draft_widget
 
 environment:
