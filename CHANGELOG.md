@@ -1,3 +1,7 @@
+## 1.2.1
+
+* Add focusId in OnTransform callback
+
 ## 1.2.0
 
 * Lock design.
