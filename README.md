@@ -21,7 +21,7 @@ Flutter widget to draft widgets
 
 ```yaml
 dependencies:
-  draft_widget: ^1.2.0
+  draft_widget: ^1.2.1
 ```
 
 ## Usage
@@ -30,24 +30,24 @@ dependencies:
 DraftWidget(
     sketch: {
         2: {
-            'position': const Rect.fromLTWH(100, 100, 100, 100),
-            'widget': const ColoredBox(color: Colors.red),
-            'angle': pi / 2,
+            Component.position: const Rect.fromLTWH(100, 100, 100, 100),
+            Component.widget: const ColoredBox(color: Colors.red),
+            Component.angle: pi / 2,
         },
         1: {
-            'position': const Rect.fromLTWH(150, 150, 200, 200),
-            'widget': Image.asset('images/ending_dash.png'),
-            'angle': pi / 4,
+            Component.position: const Rect.fromLTWH(150, 150, 200, 200),
+            Component.widget: Image.asset('images/ending_dash.png'),
+            Component.angle: pi / 4,
         },
         3: {
-            'position': const Rect.fromLTWH(200, 200, 50, 50),
-            'widget': const ColoredBox(color: Colors.blue),
-            'lock': true,
+            Component.position: const Rect.fromLTWH(200, 200, 50, 50),
+            Component.widget: const ColoredBox(color: Colors.blue),
+            Component.lock: true,
         },
         4: {
-            'position': const Rect.fromLTWH(250, 250, 50, 50),
-            'widget': const ColoredBox(color: Colors.yellow),
-            'visibility': false,
+            Component.position: const Rect.fromLTWH(250, 250, 50, 50),
+            Component.widget: const ColoredBox(color: Colors.yellow),
+            Component.visibility: false,
         },
     },
 );
