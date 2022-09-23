@@ -132,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 setState(() {
                   _sketch = _sketch.map((key, value) => MapEntry(
                       key,
-                      id == id
+                      key == id
                           ? Map.fromEntries({
                               ...value.entries,
                               MapEntry(Component.position, rect),
@@ -149,7 +149,8 @@ class _MyHomePageState extends State<MyHomePage> {
             child: ListView.builder(
               itemBuilder: (_, index) {
                 final entry = _sketch.entries.elementAt(index);
-                final visibility = entry.value[Component.visibility] as bool? ?? true;
+                final visibility =
+                    entry.value[Component.visibility] as bool? ?? true;
                 final lock = entry.value[Component.lock] as bool? ?? false;
                 return ListTile(
                   leading: IconButton(

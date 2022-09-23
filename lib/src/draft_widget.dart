@@ -60,7 +60,8 @@ class DraftWidget extends StatelessWidget {
     final transformState = ValueNotifier<Matrix4>(Matrix4.identity());
     final transformingState = ValueNotifier<bool>(false);
     final lockFocus = ValueNotifier<bool>(
-      sketch[_focusState.value]?.let((it) => it['lock'] as bool?) ?? false,
+      sketch[_focusState.value]?.let((it) => it[Component.lock] as bool?) ??
+          false,
     );
 
     return GestureDetector(
@@ -76,7 +77,9 @@ class DraftWidget extends StatelessWidget {
         child: Stack(
           children: [
             ...sketch.entries
-                .where((element) => element.value['visibility'] != false)
+                .where(
+                  (element) => element.value[Component.visibility] != false,
+                )
                 .map(
                   (e) => _TransformWidget(
                     id: e.key,
@@ -88,16 +91,16 @@ class DraftWidget extends StatelessWidget {
                     hoverAngle: hoverAngle,
                     hoverState: _hoverState,
                     transformingState: transformingState,
-                    position: e.value['position'] as Rect,
-                    angle: e.value['angle'] as double? ?? 0.0,
-                    lock: e.value['lock'] as bool? ?? false,
+                    position: e.value[Component.position] as Rect,
+                    angle: e.value[Component.angle] as double? ?? 0.0,
+                    lock: e.value[Component.lock] as bool? ?? false,
                     lockFocus: lockFocus,
                     onEnd: () => _onTransform(
                       transformState.value,
                       focusPosition.value!,
                       focusAngle.value,
                     ),
-                    child: e.value['widget'] as Widget,
+                    child: e.value[Component.widget] as Widget,
                   ),
                 ),
             _DecorationWidget(
@@ -141,10 +144,12 @@ class DraftWidget extends StatelessWidget {
   }
 
   Rect? _position(int key) {
-    return sketch.containsKey(key) ? sketch[key]!['position'] as Rect : null;
+    return sketch.containsKey(key)
+        ? sketch[key]![Component.position] as Rect
+        : null;
   }
 
-  double _angle(int key) => sketch[key]?['angle'] as double? ?? 0.0;
+  double _angle(int key) => sketch[key]?[Component.angle] as double? ?? 0.0;
 
   void _onTransform(Matrix4 matrix4, Rect rect, double angle) {
     final transform = Matrix4.translationValues(

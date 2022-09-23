@@ -1,3 +1,7 @@
+## 1.2.2
+
+* Fix bugs
+
 ## 1.2.1
 
 * Add focusId in OnTransform callback
