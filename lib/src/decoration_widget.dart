@@ -1,4 +1,4 @@
-part of 'draft_widget.dart';
+part of 'sketch_widget.dart';
 
 class _DecorationWidget extends StatelessWidget {
   const _DecorationWidget({

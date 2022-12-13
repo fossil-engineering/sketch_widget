@@ -1,4 +1,4 @@
-part of 'draft_widget.dart';
+part of 'sketch_widget.dart';
 
 class _TransformWidget extends StatelessWidget {
   const _TransformWidget({

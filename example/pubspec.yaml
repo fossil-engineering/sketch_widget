@@ -30,7 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  draft_widget:
+  sketch_widget:
     path: ..
 
 

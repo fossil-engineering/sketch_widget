@@ -1,10 +1,10 @@
-# draft_widget
+# sketch_widget
 
-![Build](https://github.com/fossil-engineering/draft_widget/workflows/CI/badge.svg)
-[![pub package](https://img.shields.io/pub/v/draft_widget.svg)](https://pub.dev/packages/draft_widget)
+![Build](https://github.com/fossil-engineering/sketch_widget/workflows/CI/badge.svg)
+[![pub package](https://img.shields.io/pub/v/sketch_widget.svg)](https://pub.dev/packages/sketch_widget)
 [![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link]
 
-Flutter widget to draft widgets
+Flutter widget to sketch widgets
 
 [very_good_analysis_badge]: https://img.shields.io/badge/style-very_good_analysis-B22C89.svg
 [very_good_analysis_link]: https://pub.dev/packages/very_good_analysis
@@ -21,13 +21,13 @@ Flutter widget to draft widgets
 
 ```yaml
 dependencies:
-  draft_widget: ^1.2.1
+  sketch_widget: ^1.2.1
 ```
 
 ## Usage
 
 ```dart
-DraftWidget(
+SketchWidget(
     sketch: {
         2: {
             Component.position: const Rect.fromLTWH(100, 100, 100, 100),
@@ -53,7 +53,7 @@ DraftWidget(
 );
 ```
 
-![](https://raw.githubusercontent.com/de-men/draft_widget/main/readme_images/screenshot.png)
+![](https://raw.githubusercontent.com/fossil-engineering/sketch_widget/main/readme_images/screenshot.png)
 
 ## Additional information
 

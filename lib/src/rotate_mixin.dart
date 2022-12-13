@@ -1,4 +1,4 @@
-part of 'draft_widget.dart';
+part of 'sketch_widget.dart';
 
 mixin _Rotate {
   late final ValueNotifier<bool> transformingState;

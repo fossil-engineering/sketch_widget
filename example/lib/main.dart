@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:draft_widget/draft_widget.dart';
+import 'package:sketch_widget/sketch_widget.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -123,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Flexible(
             flex: 9,
-            child: DraftWidget(
+            child: SketchWidget(
               focusState: _focus,
               lockRatio: _lockRatio,
               sketch: _sketch,
@@ -132,7 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 setState(() {
                   _sketch = _sketch.map((key, value) => MapEntry(
                       key,
-                      id == id
+                      key == id
                           ? Map.fromEntries({
                               ...value.entries,
                               MapEntry(Component.position, rect),
