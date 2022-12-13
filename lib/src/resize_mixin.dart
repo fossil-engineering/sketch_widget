@@ -1,4 +1,4 @@
-part of 'draft_widget.dart';
+part of 'sketch_widget.dart';
 
 final _quaternionIdentity = Quaternion.identity();
 final _vector3Zero = Vector3.zero();

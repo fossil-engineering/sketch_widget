@@ -1,6 +1,6 @@
-import 'package:draft_widget/draft_widget.dart';
-import 'package:draft_widget/src/util.dart';
 import 'package:flutter/material.dart';
+import 'package:sketch_widget/sketch_widget.dart';
+import 'package:sketch_widget/src/util.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 part 'control_widget.dart';
@@ -19,10 +19,10 @@ const noPosition = -1;
 /// Callback when the transformation done with focusId and their info
 typedef OnTransform = void Function(int, Rect, double);
 
-/// DraftWidget to draft widgets
-class DraftWidget extends StatelessWidget {
-  /// DraftWidget Constructor
-  DraftWidget({
+/// SketchWidget to sketch widgets
+class SketchWidget extends StatelessWidget {
+  /// SketchWidget Constructor
+  SketchWidget({
     required this.sketch,
     ValueNotifier<int>? hoverState,
     ValueNotifier<int>? focusState,
@@ -35,7 +35,7 @@ class DraftWidget extends StatelessWidget {
         _rotate = rotate ?? ValueNotifier(true),
         _lockRatio = lockRatio ?? ValueNotifier(true);
 
-  /// Widgets will be drafted.
+  /// Widgets will be sketched.
   final Map<int, Map<Component, dynamic>> sketch;
 
   /// Callback when end transforming.
@@ -75,31 +75,31 @@ class DraftWidget extends StatelessWidget {
         onInteractionUpdate: (_) => scaleState.value = controller.value.scaleX,
         child: Stack(
           children: [
-            ...sketch.entries
-                .where((element) => element.value['visibility'] != false)
-                .map(
-                  (e) => _TransformWidget(
-                    id: e.key,
-                    transformState: transformState,
-                    focusPosition: focusPosition,
-                    focusAngle: focusAngle,
-                    focusState: _focusState,
-                    hoverPosition: hoverPosition,
-                    hoverAngle: hoverAngle,
-                    hoverState: _hoverState,
-                    transformingState: transformingState,
-                    position: e.value['position'] as Rect,
-                    angle: e.value['angle'] as double? ?? 0.0,
-                    lock: e.value['lock'] as bool? ?? false,
-                    lockFocus: lockFocus,
-                    onEnd: () => _onTransform(
-                      transformState.value,
-                      focusPosition.value!,
-                      focusAngle.value,
-                    ),
-                    child: e.value['widget'] as Widget,
-                  ),
+            ...sketch.entries.where((element) {
+              return element.value[Component.visibility] != false;
+            }).map(
+              (e) => _TransformWidget(
+                id: e.key,
+                transformState: transformState,
+                focusPosition: focusPosition,
+                focusAngle: focusAngle,
+                focusState: _focusState,
+                hoverPosition: hoverPosition,
+                hoverAngle: hoverAngle,
+                hoverState: _hoverState,
+                transformingState: transformingState,
+                position: e.value[Component.position] as Rect,
+                angle: e.value[Component.angle] as double? ?? 0.0,
+                lock: e.value[Component.lock] as bool? ?? false,
+                lockFocus: lockFocus,
+                onEnd: () => _onTransform(
+                  transformState.value,
+                  focusPosition.value!,
+                  focusAngle.value,
                 ),
+                child: e.value[Component.widget] as Widget,
+              ),
+            ),
             _DecorationWidget(
               positionState: focusPosition,
               angleState: focusAngle,
@@ -141,10 +141,12 @@ class DraftWidget extends StatelessWidget {
   }
 
   Rect? _position(int key) {
-    return sketch.containsKey(key) ? sketch[key]!['position'] as Rect : null;
+    return sketch.containsKey(key)
+        ? sketch[key]![Component.position] as Rect
+        : null;
   }
 
-  double _angle(int key) => sketch[key]?['angle'] as double? ?? 0.0;
+  double _angle(int key) => sketch[key]?[Component.angle] as double? ?? 0.0;
 
   void _onTransform(Matrix4 matrix4, Rect rect, double angle) {
     final transform = Matrix4.translationValues(
